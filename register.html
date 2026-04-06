@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- Bootstrap link -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js">
+    <!-- datatables -->
+    <link rel="stylesheet" href="//cdn.datatables.net/2.3.7/css/dataTables.dataTables.min.css">
+    <link rel="stylesheet" href="//cdn.datatables.net/2.3.7/js/dataTables">
+    <!-- fontawesome cdn -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+    <div>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Navbar</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="register.html">Register</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="login.html">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Employees</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="container" id="app">
+        <form name="form" @submit.prevent="checkuser">
+            <div class="mb-3">
+                <label for="full_name" class="form-label">FullName</label>
+                <input type="text" v-model="full_name" class="form-control" id="full_name"
+                    placeholder="Enter your name">
+            </div>
+            <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">Email</label>
+                <input type="email" class="form-control" v-model="email" id="exampleInputEmail1"
+                    placeholder="Enter your email" aria-describedby="emailHelp">
+            </div>
+            <div class="mb-3">
+                <label for="exampleInputPassword1" class="form-label">Password</label>
+                <input type="password" v-model="password" placeholder="Enter your password" class="form-control"
+                    id="exampleInputPassword1">
+            </div>
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+
+        <div class="alert alert-success" v-if="alertSuccessShow" role="alert">
+            {{alertMessage}}
+        </div>
+        <div class="alert alert-danger" v-if="alertErrorShow" role="alert">
+            {{alertMessage}}
+        </div>
+
+        <div v-if="loader">
+            <i class="fa-solid fa-spinner fa-spin fa-xl"></i>
+        </div>
+    </div>
+
+    <!-- jsquery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"
+        integrity="sha512-Pa4Jto+LuCGBHy2/POQEbTh0reuoiEXQWXGn8S7aRlhcwpVkO8+4uoZVSOqUjdCsE+77oygfu2Tl+7qGHGIWsw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- datatable -->
+    <script src="https://cdn.datatables.net/2.3.7/js/dataTables.js"></script>
+    <!-- vue cdn -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.7.16/vue.min.js"
+        integrity="sha512-Wx8niGbPNCD87mSuF0sBRytwW2+2ZFr7HwVDF8krCb3egstCc4oQfig+/cfg2OHd82KcUlOYxlSDAqdHqK5TCw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- axios cdn -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.8/axios.js"
+        integrity="sha512-+dJa1RvuE8/HFftifMtr7hqixdEkb/DizfXUZAA0pyZeVdNnyZyKy9RnIWi0JSWUznbCNbaQNn0E6nbtrdL+9g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- bootstrap  -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"
+        integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y"
+        crossorigin="anonymous"></script>
+    <!-- <script>
+        $(document).ready(function () {
+            $('#table').DataTable();
+        });
+    </script> -->
+
+    <script>
+        new Vue({
+            el: "#app",
+            data: {
+                full_name: "",
+                email: "",
+                password: "",
+                alertSuccessShow: false,
+                alertErrorShow: false,
+                alertMessage: "",
+                loader:false
+            },
+            methods: {
+               async checkuser() {
+                    if (this.full_name == "" || this.email == "" || this.password == "") {
+                        this.loader = true;
+                        this.alertErrorShow = true;
+                        this.alertMessage = "Fill all fields"
+                        this.loader = false;
+                    } else {
+                        this.loader = false;
+                        axios.post("http://127.0.0.1:5000/register", {
+                            full_name: this.full_name,
+                            email: this.email,
+                            password: this.password,
+                        })
+                            .then((response) => {
+                                // console.log(response.data);
+                                this.alertErrorShow = false;
+                                this.loader = false;
+                                this.alertSuccessShow = true;
+                                this.alertMessage = "User registered successfully";
+                                console.log(response.data.token)
+                                // we will store the token in the browser local storage for index.html and others to use 
+                                localStorage.setItem("token",response.data.token)
+                                window.location.href = "index.html"
+                            })
+                            .catch((error) => {
+                                // console.error("Error registering user:", error);
+                                this.alertErrorShow = true;
+                                this.loader = false;
+                                this.alertSuccessShow = false;
+                                this.alertMessage = "Something went wrong";
+                            });
+                    }
+                },
+                // getUser() {
+                //     axios.get("http://127.0.0.1:5000/register")
+                //         .then((response) => {
+                //             console.log(response.data.data);
+                //             this.register = response.data.data;
+                //         })
+                //         .catch((error) => {
+                //             this.alertErrorShow = true;
+                //             this.alertSuccessShow = false;
+                //             this.alertMessage = "Something went wrong.";
+                //         });
+                // }
+            },
+            mounted() {
+                if (localStorage.getItem("token") != null){
+                    window.location.href = "index.html"
+                }
+            },
+        });
+    </script>
+</body>
+
+</html>
